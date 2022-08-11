@@ -1,0 +1,63 @@
+# Initialization 
+#=======================
+units 		real
+dimension	3
+atom_style 	full
+#bond_style 	harmonic
+#angle_style 	harmonic
+#pair_style 	lj/cut/tip4p/long 1 2 1 1 0.1546 12.0 10.0
+#kspace_style 	pppm/tip4p 1.0e-5
+boundary 	p p p
+
+
+#=================
+# System Defintion
+#=================
+lattice 	hcp 2.75
+region 		box block -15 15 -5 5 -5 5
+create_box 	1 box &
+		bond/types 1 &
+		angle/types 1 &
+		extra/bond/per/atom 2 &
+		extra/angle/per/atom 1 &
+		extra/special/per/atom 2
+
+#================
+# Create Oxygen
+#================
+lattice 	hcp 2.75
+region 		oxygens block -10 10 -5 5 -5 5
+create_atoms	1 region oxygens 
+
+#Add the Sodium and Chlorines
+#fix dep1 all deposit 40 3 1 13456 region rliquid near 0.3
+#fix dep2 all deposit 40 4 1 94653 region rliquid near 0.3
+
+
+#========================
+# Parameters
+#	atom 1 = Oxygen
+#	atom 2 = Hydrogen
+#	atom 3 = Sodium
+#	atom 4 = Chlorine
+#=========================
+#Molar Mass of each element
+mass		1 15.9994
+
+#Interatomic interactions
+#pair_coeff	1 1 0.1852 3.1589	#Oxygen - Oxygen
+
+#Bond between Hydrogen and Oxygen
+#bond_coeff	1 0.0 0.9572	
+
+#Angle between Hydrogens around the Oxygen	
+#angle_coeff	1 0.0 104.52
+
+#=======================
+# Run conditions
+#=======================
+
+
+write_data data.Oxygen_Lattice.lammps
+
+

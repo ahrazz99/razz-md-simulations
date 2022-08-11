@@ -1,0 +1,33 @@
+#Header Information
+
+# atoms
+# atom types
+# bonds
+# bond types 
+# angle
+# angle types
+
+# # xlo xhi
+# # ylo yhi
+# # zlo zhi
+
+Masses
+
+1 15.994
+2 1.008
+
+Atoms
+
+<atomID> <MoleculeID> <atomType> <q> <x> <y> <z>
+
+Velocities
+
+<atomID> <vx> <vy> <vz>
+
+Bonds 
+
+<bondID> <bondType> <IDatom1> <IDatom2>
+
+Angles
+
+<angleID> <angleType> <IDatom1> <IDatom2> <IDatom3>

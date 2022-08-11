@@ -1,0 +1,72 @@
+# Initialization 
+#=======================
+units 		real
+dimension	3
+atom_style 	full
+#bond_style 	harmonic
+#angle_style 	harmonic
+#pair_style 	lj/cut/tip4p/long 1 2 1 1 0.1546 12.0 10.0
+#kspace_style 	pppm/tip4p 1.0e-5
+boundary 	p p p
+
+#=================
+# System Defintion
+#=================
+
+#lattice----------------------------------------------
+# Uses the Orthohombic Unit Cell from J. Chem. Phys. 106, 1518 (1997); https://doi.org/10.1063/1.473300
+#	Each unit cell has 8 Oxygens inside the system that are perfectly tetrahedral from each other
+#	The region command generates a box based on the desired number of unit cells in each direction
+#	Therefore, a region of "0 5 0 5 0 5" builds a volume of 125 unit cells by going 
+#		5 unit cells in the positive x,y and z directions
+#		To determine the number of H2O molecules that will be present simply calculate the 
+#		volume of unit cells (length * width * height) and multiply by 8
+
+variable 	R equal 2.75
+variable 	xLen equal ${R}*sqrt(8.0/3.0)
+variable 	yLen equal ${R}*sqrt(8.0)
+variable 	zLen equal ${R}*8.0/3.0
+variable	xCoord1 equal 1.0/4.0
+variable 	xCoord2 equal 3.0/4.0
+variable 	yCoord1 equal 1.0/6.0
+variable 	yCoord2 equal 1.0/3.0
+variable	yCoord3	equal 2.0/3.0 
+variable 	yCoord4 equal 5.0/6.0
+variable 	zCoord1 equal 3.0/16.0
+variable 	zCoord2 equal 5.0/16.0 
+variable	zCoord3	equal 11.0/16.0
+variable 	zCoord4 equal 13.0/16.0
+
+lattice custom 1.0 &
+	a1 	${xLen} 0.0 0.0 &
+	a2 	0.0 ${yLen} 0.0 &
+	a3 	0.0 0.0 ${zLen} &
+	basis 	${xCoord1} ${yCoord1} ${zCoord1} &
+	basis 	${xCoord2} ${yCoord2} ${zCoord2} &
+	basis 	${xCoord1} ${yCoord1} ${zCoord4} &
+	basis 	${xCoord2} ${yCoord2} ${zCoord3} &
+	basis 	${xCoord2} ${yCoord3} ${zCoord1} &
+	basis 	${xCoord1} ${yCoord4} ${zCoord2} &
+	basis 	${xCoord2} ${yCoord3} ${zCoord4} &
+	basis 	${xCoord1} ${yCoord4} ${zCoord3} 
+
+region 		box block 0 5 0 5 0 5 units lattice
+create_box 	1 box 
+
+# Create Oxygen--------------------------------------
+create_atoms 	1 box 
+
+
+
+
+#========================
+# Molar Mass of each element
+#=========================
+mass		1 15.9994
+
+#=======================
+# Output System
+#=======================
+write_data data.Oxygen_Lattice_3.1.lammps
+
+
