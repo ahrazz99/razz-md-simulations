@@ -23,10 +23,20 @@ class Atom(ABC):
         return self.__axes
 
     @abstractmethod
-    def addChemBond(self, Atom=atom):
+    def addChemBond(self, atom):
         pass
 
     @abstractmethod
-    def addAxis(self, Axis=axis):
+    def removeBond(self):
         pass
+
+    def addAxis(self, axis):
+        self.__axes.append(axis)
+
+    def numChemBonds(self):
+        return len(self.__chemBonds)
+
+    def numAxes(self):
+        return len(self.__axes)
+
 
