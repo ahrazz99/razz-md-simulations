@@ -1,14 +1,25 @@
 """
 Import Statements
 """
-
-
+import Atom
+import Axis
+import Hydrogen
+import Oxygen
+import Site
+import sys
+import time
 
 """
 Initial Input Pulling
 Read information from data file
 """
+if len(sys.argv) < 2:
+    print("Usage: input the datafile containing the Oxygen Lattice")
+    sys.exit(1)
 
+print("This is the file: " + sys.argv[0])
+
+print("The input file is: " + sys.argv[1])
 
 
 

@@ -1,42 +1,43 @@
-from abc import ABC, abstractmethod
-import Axis
-
-
-class Atom(ABC):
+"""Class Header"""
+class Atom(object):
     """Class Atom to be used as the parent class to the Oxygen and Hydrogen 
-        classes to allow for polymorphism"""
-    def __init__(self, posX, posY, posZ):
-        """Atom Constructor"""
-        self.__posX = 0
-        self.__posY = 0
-        self.__posZ = 0
+        classes to allow for polymorphism
+    """
+
+    """Constructor"""
+    def __init__(self, position):
+        self.__position = position
         self.__chemBonds = []
-        self.__axes = []
 
+    """Methods"""
+
+    #getPosition method
+    #   input: none
+    #   output: the position of the Atom
     def getPosition(self):
-        return [self.__posX, self.__posY, self.__posZ]
-
-    def getChemBonds(self):
-        return self.__chemBonds
+        return self.__position
     
-    def getAxes(self):
-        return self.__axes
-
-    @abstractmethod
+    #addChemBond method
+    #   input: the Atom to add to the list
+    #   output: none
     def addChemBond(self, atom):
-        pass
+        self.__chemBonds.append(atom)
 
-    @abstractmethod
-    def removeBond(self):
-        pass
+    #getChemBond method
+    #   input: the index of the bond desired
+    #   output: the bond at the index if present, none if not
+    def getChemBond(self, index):
+        if len(self.__chemBonds) < (index + 1):
+            return none
+        else:
+            return self.__chembonds[index]
 
-    def addAxis(self, axis):
-        self.__axes.append(axis)
-
-    def numChemBonds(self):
-        return len(self.__chemBonds)
-
-    def numAxes(self):
-        return len(self.__axes)
-
+    #delChemBond method
+    #   input: the index of the Atom to remove
+    #   output: the removed Atom
+    def delChemBond(self, index):
+        if len(self.__chemBonds) < (index + 1):
+            return none
+        else:
+            return self.__chemBonds.pop(index)
 

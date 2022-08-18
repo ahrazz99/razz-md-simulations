@@ -1,38 +1,40 @@
-import Atom
-import Axis
-import Site
-import Oxygen
+"""Imports"""
+from Atom import Atom
 
+"""Class Header"""
 class Hydrogen(Atom):
+    """Constructor"""
+    def __init__(self, position):
+        super().__init__(self, position)
 
-    def __init__(self, posX, posY, posZ):
-        super().__init__(posX, posY, posZ)
-
+    """Methods"""
+    #addChemBond overriden method
+    #   input: the bond to add
+    #   output: false if there is already a bonded Atom
+    #           otherwise, returns true
     def addChemBond(self, atom):
-        if len(self.getChemBonds()) == 1:
-            print("This Hydrogen already has a chemical bond")
-            return
-
-        elif isinstance(atom, Oxygen):
-            self.getChemBonds().append(atom)
-
+        if len(self.__chemBonds) > 0:
+            return false
         else:
-            print("That is not an Oxygen Atom")
-            return
-        return
+            self.__chemBonds.append(atom)
+            return true
     
-
-    def getChemBonds(self):
-        if len(self.getChemBonds()) == 0:
-            print("This Hydrogen has no Chemical Bonds")
-            return null
+    #getChemBond overridden method
+    #   input: none
+    #   output: the Atom bonded to this Hydrogen
+    def getChemBond(self):
+        if len(self.__chemBonds) == 0:
+            return none
         else:
-            return self.getChemBonds()[0]
+            return self.__chemBonds[0]
 
-    def removeBond(self):
+    #delChemBond overriden method
+    #   input: none
+    #   output: the deleted chemically bonded Atom; none if no bond exists
+    def delChemBond(self):
         if len(self.getChemBonds()) == 0:
-            return
-        else
-            self.getChembonds().pop(0)
+            return none
+        else:
+            return self.getChembonds().pop(0)
 
 
