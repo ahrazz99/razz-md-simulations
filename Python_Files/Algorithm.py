@@ -36,7 +36,8 @@ dataFile.readline()
 xlo, xhi = dataFile.readline().removesuffix(" xlo xhi\n").split(" ")
 ylo, yhi = dataFile.readline().removesuffix(" ylo yhi\n").split(" ")
 zlo, zhi = dataFile.readline().removesuffix(" zlo zhi\n").split(" ")
-#xy, xz, yz = dataFile.readline().removesuffix(" xy xz yz\n").split(" ")
+
+
 dataFile.readline()
 dataFile.readline()
 dataFile.readline()
@@ -59,7 +60,22 @@ Axis Generation
 Loop through the Oxygen Atoms list and find each neighbor
 while generating the lists associated - the Axes and Sites
 """
+axes = []
+for oxy in oxygens:
+    dist = math.dist(oxygens[0].getPosition(), oxy.getPosition())
+    if dist < 4:
+        print(str(dist))
 
+
+"""
+distances = []
+for oxy in oxygens:
+    dist = []
+    for oxy2 in oxygens:
+        dist.append(math.dist(oxy2.getPosition(), oxy.getPosition()))
+    distances.append(dist)
+print(distances)
+"""
 
 
 """
