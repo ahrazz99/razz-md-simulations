@@ -1,13 +1,14 @@
 """
 Import Statements
 """
-import Atom
-import Axis
-import Hydrogen
-import Oxygen
-import Site
+from Atom import Atom
+from Axis import Axis
+from Hydrogen import Hydrogen
+from Oxygen import Oxygen
+from Site import Site
 import sys
 import time
+import math
 
 """
 Initial Input Pulling
@@ -17,12 +18,41 @@ if len(sys.argv) < 2:
     print("Usage: input the datafile containing the Oxygen Lattice")
     sys.exit(1)
 
-print("This is the file: " + sys.argv[0])
+#Open the file given
+dataFile = open(sys.argv[1])
 
-print("The input file is: " + sys.argv[1])
+#before = time.time()
 
+#Skip the Header
+dataFile.readline()
+dataFile.readline()
 
+#Pull in the initial set-up values
+numAtoms = int(dataFile.readline().removesuffix(" atoms\n"))
+numAtomTypes = int(dataFile.readline().removesuffix(" atom types\n"))
 
+dataFile.readline()
+
+xlo, xhi = dataFile.readline().removesuffix(" xlo xhi\n").split(" ")
+ylo, yhi = dataFile.readline().removesuffix(" ylo yhi\n").split(" ")
+zlo, zhi = dataFile.readline().removesuffix(" zlo zhi\n").split(" ")
+#xy, xz, yz = dataFile.readline().removesuffix(" xy xz yz\n").split(" ")
+dataFile.readline()
+dataFile.readline()
+dataFile.readline()
+dataFile.readline()
+dataFile.readline()
+dataFile.readline()
+dataFile.readline()
+
+"""
+Generate the Oxygen Atom List
+"""
+oxygens = []
+
+for i in range(numAtoms):
+    atomId, molId, atomType, q, posX, posY, posZ = dataFile.readline().removesuffix(" 0 0 0\n").split(" ")
+    oxygens.append(Oxygen([float(posX), float(posY), float(posZ)]))
 
 """
 Axis Generation
