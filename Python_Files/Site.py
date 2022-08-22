@@ -1,5 +1,5 @@
 """imports"""
-import Hydrogen
+from Hydrogen import Hydrogen
 
 """Class Header"""
 class Site():

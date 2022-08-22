@@ -28,7 +28,7 @@ class Oxygen(Atom):
     #           the neighbor at the index
     def getNeighbor(self, index):
         if len(self.__neighbors) < index + 1:
-            return none
+            return None
         else:
             return self.__neighbors[index]
 

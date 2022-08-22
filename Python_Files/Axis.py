@@ -1,7 +1,7 @@
 """Imports"""
-import Site
+from Site import Site
 import math
-import Oxygen
+from Oxygen import Oxygen
 
 """Class Header"""
 class Axis():
@@ -77,5 +77,5 @@ class Axis():
         posZ = oxy1Pos[2] + vec[2]
         
         #Generate and return the new Site 
-        site = Site(oxy1, posX, posY, posZ)
+        site = Site([posX, posY, posZ])
         return site
