@@ -61,7 +61,7 @@ oxygens = []
 
 for i in range(numAtoms):
     atomId, molId, atomType, q, posX, posY, posZ = dataFile.readline().removesuffix(" 0 0 0\n").split(" ")
-    oxygens.append(Oxygen([float(posX), float(posY), float(posZ)]))
+    oxygens.append(Oxygen([round(float(posX),5), round(float(posY), 5), round(float(posZ), 5)]))
 
 
 """
@@ -88,90 +88,81 @@ highZ = round(zHi - lowestZ, 5)
 
 print("highests: " + str(highX) + ", " + str(highY) + ", " + str(highZ))
 
+'''Helpful Methods'''
+def isXEdge(posX):
+    return posX == lowestX or posX == highX
+
+def isYEdge(posY):
+    return posY == lowestY or posY == highY
+
+def isZEdge(posZ):
+    return posZ == lowestZ or posZ == highZ
+
+def isEdge(oxygen):
+    position = oxygen.getPosition()
+    return isXEdge(position[0]) or isYEdge(position[1]) or isZEdge(position[2])
+
+def axisExist(oxyA, oxyB):
+    for axis in axes:
+        oxys = axis.getOxygens()
+        if (oxyA == oxys[0] and oxyB == oxys[1]) or (oxyA == oxys[1] and oxyB == oxys[0]):
+            return True
+    return False
+
+'''
+Generate the Ghost Atom list for PBC
+'''
+ghosts = []
+for oxy in oxygens:
+    if isEdge(oxy):
+        oxyPos = oxy.getPosition()
+        posX = oxyPos[0]
+        posY = oxyPos[1]
+        posZ = oxyPos[2]
+        if isXEdge(posX):
+            if posX == lowestX:
+                posX += xHi
+            else:
+                posX -= xHi
+        if isYEdge(posY):
+            if posY == lowestY:
+                posY += yHi
+            else:
+                posY -= yHi
+        if isZEdge(posZ):
+            if posZ == lowestZ:
+                posZ += zHi
+            else:
+                posZ -= zHi
+        ghosts.append(Oxygen([posX, posY, posZ]))
+
 #Loop through the oxygens
-for i in range(20):
-    
-    #Loop through the oxygens
+for i in range(len(oxygens)):
+        
+    #Loop through the real oxygens
     for j in range(len(oxygens)):
         if i != j:
-            #Pull the oxygen's position
-            position = oxygens[i].getPosition()
-            posX = round(position[0], 5)
-            posY = round(position[1], 5)
-            posZ = round(position[2], 5)
-
-            #If the oxygen is in an edge, wrap around because of PBCs
-            isEdgeX = posX == lowestX or posX == highX
-            isEdgeY = posY == lowestY or posY == highY
-            isEdgeZ = posZ == lowestZ or posZ == highZ
-
-            isEdge = isEdgeX or isEdgeY or isEdgeZ
-            
-            #Calculate distance from i oxygen to j oxygen
-            distance = math.dist(position, oxygens[j].getPosition())
-            
-            #Add the oxygen as a neighbor if close enough and generate the axis
+            distance = math.dist(oxygens[i].getPosition(), oxygens[j].getPosition())
+            print("Distance from oxy 0 to oxy " + str(j) + " is: " + str(distance))
             if round(distance, 5) == 2.75000:
                 oxygens[i].addNeighbor(oxygens[j])
-                axes.append(Axis(oxygens[i], oxygens[j]))
-                continue
+                if not axisExist(oxygens[i], oxygens[j]):
+                    axes.append(Axis(oxygens[i], oxygens[j]))
 
-            #Check if the oxygen is an edge and treat it accordingly
-            if isEdge:
-                #generate a ghost oxygen for axis/hydrogen generation around the oxygen being studied
-                print("Oxy " + str(i) + " is an edge")     
-                ##Check if j oxygen is an edge
-                positionJ = oxygens[j].getPosition()
-                posX = round(positionJ[0], 5)
-                posY = round(positionJ[1], 5)
-                posZ = round(positionJ[2], 5)
+    #Check if an oxygen is considered an edge
+    if isEdge(oxygens[i]):
+        #if oxygen is an edge, loop through the ghosts checking for the nearest ones
+        for ghost in ghosts:
+            distance = math.dist(oxygens[i].getPosition(), ghost.getPosition())
+            print("distance from oxy 0 to ghost atom is " + str(distance))
+            if round(distance, 5) == 2.75000:
+                oxygens[i].addNeighbor(ghost)
+                axes.append(Axis(oxygens[i], ghost))
 
-                ##If the oxygen is in an edge, wrap around because of PBCs
-                isJEdgeX = posX == lowestX or posX == highX
-                isJEdgeY = posY == lowestY or posY == highY
-                isJEdgeZ = posZ == lowestZ or posZ == highZ
-
-                isJEdge = isJEdgeX or isJEdgeY or isJEdgeZ
-
-                ##check which edges it is on and modify the position according
-                if isJEdge:
-                    print("oxy " + str(j) + " is an edge at ", end="")
-                    if isEdgeX:
-                        if posX == lowestX:
-                            posX += xHi
-                        else:
-                            posX -= xHi
-                        print("x, ", end="")
-
-                    if isEdgeY:
-                        if posY == lowestY:
-                            posY += yHi
-                        else:
-                            posY -= yHi
-                        print("y, ", end="")
-                
-                    if isEdgeZ: 
-                        if posZ == lowestZ:
-                            posZ += zHi
-                        else:
-                            posZ -= zHi
-                        print("z, ")
-                
-                    ##Generate the ghost oxygen with the new coordinates
-                    ghost = Oxygen([posX, posY, posZ])
-
-                    ##Calculate distance between new ghost and the neighbors
-                    distance = math.dist(ghost.getPosition(), oxygens[i].getPosition())
-                    print("distance from oxy " + str(i) + " to oxy " + str(j) + " ghost = " + str(distance))
-                    
-                    ##If the distance between them is the correct value, add the 
-                    if round(distance) == 2.75000:
-                        oxygens[i].addNeighbor(ghost)
-                        axes.append(Axis(oxygens[i], ghost))
-                        
-
-#for i in range(len(oxygens)):
- #   print("Oxygen " + str(i) + " has " + str(oxygens[i].getNumNeighbors()) + " neighbors")
+print("the number of ghost atoms: " + str(len(ghosts)))
+print("the number of Axes is: " + str(len(axes)))
+for i in range(len(oxygens)):
+    print("oxygen " + str(i) + " has " + str(oxygens[i].getNumNeighbors()) + " neighbor oxygens")
 
 """
 Hydrogen Generation

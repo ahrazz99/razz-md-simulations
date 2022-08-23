@@ -1,4 +1,4 @@
-"""Class Header"""
+
 class Atom(object):
     """Class Atom to be used as the parent class to the Oxygen and Hydrogen 
         classes to allow for polymorphism
@@ -40,4 +40,12 @@ class Atom(object):
             return none
         else:
             return self.__chemBonds.pop(index)
-
+    
+    #OVerriding Equals function
+    #   Input: self and object to compare to
+    #   Output: true if the 2 atoms' positions are the same
+    def __eq__(self, other):
+        posXCheck = self.__position[0] == other.__position[0]
+        posYCheck = self.__position[1] == other.__position[1]
+        posZCheck = self.__position[2] == other.__position[2]
+        return posXCheck and posYCheck and posZCheck
