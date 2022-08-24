@@ -4,9 +4,10 @@ from Atom import Atom
 """Class Header"""
 class Oxygen(Atom):
     """Constructor"""
-    def __init__(self, position):
+    def __init__(self, position, Id):
         super().__init__(position)
         self.__neighbors = []
+        self.__Id = Id
     
     
     """Methods"""
@@ -31,7 +32,10 @@ class Oxygen(Atom):
             return None
         else:
             return self.__neighbors[index]
-
+    
+    #getId
+    def getId(self):
+        return self.__Id
 
     
 

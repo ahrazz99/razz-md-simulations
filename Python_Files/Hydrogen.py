@@ -5,7 +5,7 @@ from Atom import Atom
 class Hydrogen(Atom):
     """Constructor"""
     def __init__(self, position):
-        super().__init__(self, position)
+        super().__init__(position)
 
     """Methods"""
     #addChemBond overriden method

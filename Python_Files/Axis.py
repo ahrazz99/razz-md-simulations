@@ -23,7 +23,7 @@ class Axis():
     #addHydrogen method
     #   Input: Hydrogen to add to a Site, the Site to add to (1 or 2)
     #   output: True or False depending on if it was successful
-    def addHydrogen(self, hydrogen, site):
+    def addHydrogen(self, hyd, site):
         if site == 1:
             return self.__site1.addHydrogen(hyd)
         elif site == 2:
@@ -45,7 +45,7 @@ class Axis():
     #getSitePosition method
     #   Input: the site to get the position of
     #   Output: a list representation of the Site's position, or an empty list
-    def getSitePos(self, site):
+    def getSitePosition(self, site):
         if site == 1:
             return self.__site1.getPosition()
         elif site == 2:

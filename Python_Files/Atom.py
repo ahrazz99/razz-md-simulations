@@ -30,7 +30,13 @@ class Atom(object):
         if len(self.__chemBonds) < (index + 1):
             return none
         else:
-            return self.__chembonds[index]
+            return self.__chemBonds[index]
+    
+    #getNumBonds method
+    #   input: none
+    #   output: the number of chemical bonds the atom currently has
+    def getNumBonds(self):
+        return len(self.__chemBonds)
 
     #delChemBond method
     #   input: the index of the Atom to remove
