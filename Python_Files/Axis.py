@@ -2,6 +2,7 @@
 from Site import Site
 import math
 from Oxygen import Oxygen
+from GhostOxygen import GhostOxygen
 
 """Class Header"""
 class Axis():
@@ -12,8 +13,21 @@ class Axis():
         self.__oxy2= oxyB
         self.__site1 = self.__calcSitePos(oxyA, oxyB)
         self.__site2 = self.__calcSitePos(oxyB, oxyA)
+        self.__hasHydrogen = False
 
     """Methods"""
+    #hasHydrogen method
+    #   input; none
+    #   output: True or False
+    def hasHydrogen(self):
+        return self.__hasHydrogen
+
+    #addGhostHyd method:
+    #   input: none
+    #   output: none
+    def addGhostHyd(self):
+        self.__hasHydrogen = True
+
     #getOxygens
     #   Input: none
     #   output: a list representation of the 2 oxygens
@@ -25,9 +39,11 @@ class Axis():
     #   output: True or False depending on if it was successful
     def addHydrogen(self, hyd, site):
         if site == 1:
-            return self.__site1.addHydrogen(hyd)
+            self.__hasHydrogen = self.__site1.addHydrogen(hyd)
+            return self.__hasHydrogen
         elif site == 2:
-            return self.__site2.addHydrogen(hyd)
+            self.__hasHydrogen = self.__site2.addHydrogen(hyd)
+            return self.__hasHydrogen
         else:
             return False
     
@@ -35,10 +51,13 @@ class Axis():
     #   Input: the site from which to get a hydrogen
     #   Output: None if there isn't a hydrogen, otherwise, the Hydrogen
     def getHydrogen(self, site):
-        if site == 1:
-            return self.__site1.getHydrogen()
-        elif site == 2:
-            return self.__site2.getHydrogen()
+        if self.__hasHydrogen:
+            if site == 1:
+                return self.__site1.getHydrogen()
+            elif site == 2:
+                return self.__site2.getHydrogen()
+            else:
+                return None
         else:
             return None
 
@@ -50,6 +69,29 @@ class Axis():
             return self.__site1.getPosition()
         elif site == 2:
             return self.__site2.getPosition()
+        else:
+            return []
+
+    #getSiteRealId method
+    #   Returns the site number of the site next to the real Oxygen Atom
+    #   Input: None
+    #   Output: 1 or 2 or -1
+    def getSiteRealId(self):
+        if isinstance(self.__oxy1, GhostOxygen):
+            return 2
+        elif isinstance(self.__oxy2, GhostOxygen):
+            return 1
+        return -1
+
+    #getSiteRealPosition method
+    #   Returns the site position of the site next to a real Oxygen Atom
+    #   Input: None
+    #   Output: the site position of the site next to the real oxygen
+    def getSiteRealPosition(self):
+        if isinstance(self.__oxy1, GhostOxygen):
+            return self.__site2.getPosition()
+        elif isinstance(self.__oxy2, GhostOxygen):
+            return self.__site1.getPosition()
         else:
             return []
 
