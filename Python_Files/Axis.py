@@ -38,14 +38,16 @@ class Axis():
     #   Input: Hydrogen to add to a Site, the Site to add to (1 or 2)
     #   output: True or False depending on if it was successful
     def addHydrogen(self, hyd, site):
-        if site == 1:
-            self.__hasHydrogen = self.__site1.addHydrogen(hyd)
-            return self.__hasHydrogen
-        elif site == 2:
-            self.__hasHydrogen = self.__site2.addHydrogen(hyd)
-            return self.__hasHydrogen
-        else:
-            return False
+        if not self.__hasHydrogen:
+            if site == 1:
+                self.__hasHydrogen = self.__site1.addHydrogen(hyd)
+                return self.__hasHydrogen
+            elif site == 2:
+                self.__hasHydrogen = self.__site2.addHydrogen(hyd)
+                return self.__hasHydrogen
+            else:
+                return False
+        return False
     
     #getHydrogen method
     #   Input: the site from which to get a hydrogen

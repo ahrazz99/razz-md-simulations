@@ -63,7 +63,7 @@ oxygens = []
 
 for i in range(numAtoms):
     atomId, molId, atomType, q, posX, posY, posZ = dataFile.readline().removesuffix(" 0 0 0\n").split(" ")
-    oxygens.append(Oxygen([round(float(posX),5), round(float(posY), 5), round(float(posZ), 5)], (i+1)))
+    oxygens.append(Oxygen([round(float(posX),5), round(float(posY), 5), round(float(posZ), 5)], i))
 dataFile.close()
 
 """
@@ -168,7 +168,6 @@ for i in range(len(oxygens)):
                 oxygens[i].addNeighbor(oxygens[j])
                 if not axisExist(oxygens[i], oxygens[j]):
                     axes.append(Axis(oxygens[i], oxygens[j]))
-
     #Check if an oxygen is considered an edge
     if isEdge(oxygens[i]):
         #if oxygen is an edge, loop through the ghosts checking for the nearest ones
@@ -177,29 +176,18 @@ for i in range(len(oxygens)):
             if distance == 2.75:
                 oxygens[i].addNeighbor(ghost)
                 axes.append(Axis(oxygens[i], ghost))
+
 """
 Hydrogen Generation
 Iterate through the Axis List for Hydrogen Generation
 """
-
-#idenGhostOxy method
-#Determines which oxygen in an axis is the ghost oxygen
-#   Input: Axis to check
-#   Output: 0 or 1
-def idenGhostOxy(axis):
-    if isinstance(axis.getOxygens()[0], GhostOxygen):
-        return 0
-    elif isinstance(axis.getOxygens()[1], GhostOxygen):
-        return 1
-    return -1
-
 
 #isGhostAxis method
 #Checks if an axis contains a ghostOxygen
 #   Input: The axis
 #   Output: True or False
 def isGhostAxis(axis):
-    return idenGhostOxy(axis) == 0 or idenGhostOxy(axis) == 1
+    return isinstance(axis.getOxygens()[1], GhostOxygen) or isinstance(axis.getOxygens()[0], GhostOxygen)
 
 
 #findAxis Method
@@ -208,62 +196,74 @@ def isGhostAxis(axis):
 #                                     reference Id of the Oyxgen from the first axis
 #       Using both references should allow identification of the exact axis that is a representation 
 #               of the same axis across the periodic boundary. 
-def findAxis(refId1, refId2):
+def findAxis(ghostParent, otherParent):
+    #find the axes with GhostParent
     for i in range(len(axes)):
-        if isGhostAxis(axes[i]):
-            oxy1 = axis.getOxygens()[0]
-            oxy2 = axis.getOxygens()[1]
-            if oxy1.getId() == refId1 and oxy2.getRefO() == refId2:
-                return i
-            elif oxy2.getId() == refId1 and oxy1.getRefO() == refId2:
-                return i
-            else:
-                return -1
+        if isGhostAxis(axes[i]) and axes[i].getOxygens()[0] == ghostParent and oxygens[axes[i].getOxygens()[1].getRefO()] == otherParent:
+            return i
+    return -1
+            
+
 #Generate the list of hydrogens
 hydrogens = []
-
-#Begin looping through the Axes
-for axis in axes:
-    if not axis.hasHydrogen():
-        site = random.randint(1,2)
-        if isGhostAxis(axis):
-            ghost = None
-            oxy = None
-            if idenGhostOxy(axis) == 0:
-                ghost = axis.getOxygens()[0]
-                oxy = axis.getOxygens()[1]
-            else:
-                ghost = axis.getOxygens()[1]
-                oxy = axis.getOxygens()[0]
-            axis2= axes[findAxis(ghost.getRefO(), oxy.getId())]
-            realSite1 = axis.getSiteRealId()
-            realSite2 = axis2.getSiteRealId()
-            realSite1Pos = axis.getSiteRealPosition()
-            realSite2Pos = axis2.getSiteRealPosition()
-            if realSite1 == -1 or realSite2 == -1 or realSite1Pos == [] or realSite2Pos == []:
-                break
-            if site == 1:
-                hyd = Hydrogen(realSite1Pos)
-                axis.addHydrogen(hyd, realSite1)
-                axis.getOxygens()[realSite1 - 1].addChemBond(hyd)
-                hydrogens.append(hyd)
-                axis2.addGhostHyd()
-            else:
-                hyd = Hydrogen(realSite2Pos)
-                axis2.addHydrogen(hyd, realSite2)
-                axis2.getOxygens()[realSite2 - 1].addChemBond(hyd)
-                hydrogens.append(hyd)
-                axis.addGhostHyd()
-        else:
-            position = axis.getSitePosition(site)
+for i in range(len(axes)):
+    #Check that if there is a Hydrogen in this axis. If there is, skip it. 
+    if axes[i].hasHydrogen():
+        continue
+    else:
+        #If the axis has no Ghost atom:
+        if not isGhostAxis(axes[i]):
+            site = random.randint(1,2)
+            position = axes[i].getSitePosition(site)
             hyd = Hydrogen(position)
-            axis.addHydrogen(hyd, site)
-            axis.getOxygens()[site-1].addChemBond(hyd)
+            axes[i].addHydrogen(hyd, site)
+            axes[i].getOxygens()[site-1].addChemBond(hyd)
+            hydrogens.append(hyd)
+
+        #If the axis is a ghost axis
+        else:
+            #Find the corresponding axis across the periodic boundary
+            index = findAxis(oxygens[axes[i].getOxygens()[1].getRefO()], axes[i].getOxygens()[0]) 
+            if index == -1:
+                break
+
+            #Generate a random site number
+            site = random.randint(1,2)
+
+            #Find the position based on the site
+            position = [0,0,0]
+            if site == 1:
+                position = axes[i].getSiteRealPosition()
+            else:
+                positon = axes[index].getSiteRealPosition()
+            
+            #Generate the new hydrogen
+            hyd = Hydrogen(position)
+
+            #Add the hydrogen into the site corresponding to the nearest real atom on either axis
+            if site == 1:
+                axes[i].addHydrogen(hyd, 1)
+                
+                #Add the hydrogen as a chembond
+                axes[i].getOxygens()[0].addChemBond(hyd)
+
+                #Mark the site that didn't get the H as containing a ghost
+                axes[index].addGhostHyd()
+            else:
+                #Repeat for if the site 2 is chosen
+                axes[index].addHydrogen(hyd, 1)
+                axes[index].getOxygens()[0].addChemBond(hyd)
+                axes[i].addGhostHyd()
+
+            #Add the hydrogen to the list
             hydrogens.append(hyd)
 
 print("Number of axes = " + str(len(axes)))
 print("Number of Oxygens = " + str(len(oxygens)))
 print("Number of Hydrogens = " + str(len(hydrogens)))
+
+for ghost in ghosts:
+    print("Ghost " + str(ghost.getId()) + " has " + str(ghost.getNumBonds()) + " chemical bonds") 
 
 """
 Monte Carlo Simulation 
@@ -278,7 +278,7 @@ Write data output file
 """
 
 #Generate the new file
-file = open("ice_lattice_data2.lammps", "w")
+file = open("ice_lattice_data3.lammps", "w")
 
 #Calculate needed values:
 totNumAtoms = numAtoms + len(hydrogens)
@@ -296,8 +296,8 @@ numAngles = numBonds/2
 file.write("LAMMPS data file generated by Python Script, timestep = 0\n\n")
 
 #Add the beginning total numbers
-file.write(str(216 + len(ghosts) + len((hydrogens))) + " atoms\n")
-file.write(str(2) + " atom types\n\n")
+file.write(str(len(oxygens) + len((hydrogens))) + " atoms\n")
+file.write("2 atom types\n\n")
 #file.write(str(numBonds) + " bonds\n")
 #file.write("1 bond types\n")
 #file.write(str(numAngles) + " angles\n")
@@ -328,10 +328,6 @@ for oxy in oxygens:
         count += 1
     molCount += 1
     #'''
-for oxy in ghosts:
-    oxyPos = oxy.getPosition()
-    file.write("\t" + str(count) + "\t" + str(molCount) + "\t1\t-1.1128\t" + str(oxyPos[0]) + "\t" + str(oxyPos[1]) + "\t" + str(oxyPos[2]) + "\n")
-    count += 1
 
 
 #Add Velocities Section
