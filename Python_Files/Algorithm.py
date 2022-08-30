@@ -63,7 +63,7 @@ oxygens = []
 
 for i in range(numAtoms):
     atomId, molId, atomType, q, posX, posY, posZ = dataFile.readline().removesuffix(" 0 0 0\n").split(" ")
-    oxygens.append(Oxygen([round(float(posX),5), round(float(posY), 5), round(float(posZ), 5)], i))
+    oxygens.append(Oxygen([float(posX), float(posY), float(posZ)], i))
 dataFile.close()
 
 """
@@ -88,13 +88,13 @@ highZ = round(zHi - lowestZ, 5)
 
 '''Helpful Methods'''
 def isXEdge(posX):
-    return posX == lowestX or posX == highX
+    return round(posX, 5) == lowestX or round(posX, 5) == highX
 
 def isYEdge(posY):
-    return posY == lowestY or posY == highY
+    return round(posY, 5) == lowestY or round(posY, 5) == highY
 
 def isZEdge(posZ):
-    return posZ == lowestZ or posZ == highZ
+    return round(posZ, 5) == lowestZ or round(posZ ,5) == highZ
 
 def isEdge(oxygen):
     position = oxygen.getPosition()
@@ -118,9 +118,9 @@ for oxy in oxygens:
         posY = oxyPos[1]
         posZ = oxyPos[2]
         if isXEdge(posX) and isYEdge(posY) and isZEdge(posZ):
-            temp1 = posX + xHi if posX == lowestX else posX - xHi
-            temp2 = posY + yHi if posY == lowestY else posY - yHi
-            temp3 = posZ + zHi if posZ == lowestZ else posZ - zHi
+            temp1 = posX + xHi if round(posX, 5) == lowestX else posX - xHi
+            temp2 = posY + yHi if round(posY, 5) == lowestY else posY - yHi
+            temp3 = posZ + zHi if round(posZ, 5) == lowestZ else posZ - zHi
             ghosts.append(GhostOxygen([temp1, posY, posZ], oxy.getId(), len(ghosts) + 1000))
             ghosts.append(GhostOxygen([posX, temp2, posZ], oxy.getId(), len(ghosts) + 1000))
             ghosts.append(GhostOxygen([posX, posY, temp3], oxy.getId(), len(ghosts) + 1000))
@@ -129,31 +129,31 @@ for oxy in oxygens:
             ghosts.append(GhostOxygen([temp1, posY, temp3], oxy.getId(), len(ghosts) + 1000))
             ghosts.append(GhostOxygen([temp1, temp2, temp3], oxy.getId(), len(ghosts) + 1000))
         elif isXEdge(posX) and isYEdge(posY):
-            temp1 = posX + xHi if posX == lowestX else posX - xHi
-            temp2 = posY + yHi if posY == lowestY else posY - yHi
+            temp1 = posX + xHi if round(posX, 5) == lowestX else posX - xHi
+            temp2 = posY + yHi if round(posY, 5) == lowestY else posY - yHi
             ghosts.append(GhostOxygen([temp1, posY, posZ], oxy.getId(), len(ghosts) + 1000))
             ghosts.append(GhostOxygen([posX, temp2, posZ], oxy.getId(), len(ghosts) + 1000))
             ghosts.append(GhostOxygen([temp1, temp2, posZ], oxy.getId(), len(ghosts) + 1000))
         elif isXEdge(posX) and isZEdge(posZ):
-            temp1 = posX + xHi if posX == lowestX else posX - xHi
-            temp3 = posZ + zHi if posZ == lowestZ else posZ - zHi
+            temp1 = posX + xHi if round(posX, 5) == lowestX else posX - xHi
+            temp3 = posZ + zHi if round(posZ, 5) == lowestZ else posZ - zHi
             ghosts.append(GhostOxygen([temp1, posY, posZ], oxy.getId(), len(ghosts) + 1000))
             ghosts.append(GhostOxygen([posX, posY, temp3], oxy.getId(), len(ghosts) + 1000))
             ghosts.append(GhostOxygen([temp1, posY, temp3], oxy.getId(), len(ghosts) + 1000))
         elif isYEdge(posY) and isZEdge(posZ):
-            temp2 = posY + yHi if posY == lowestY else posY - yHi
-            temp3 = posZ + zHi if posZ == lowestZ else posZ - zHi
+            temp2 = posY + yHi if round(posY, 5) == lowestY else posY - yHi
+            temp3 = posZ + zHi if round(posZ, 5) == lowestZ else posZ - zHi
             ghosts.append(GhostOxygen([posX, temp2, posZ], oxy.getId(), len(ghosts) + 1000))
             ghosts.append(GhostOxygen([posX, posY, temp3], oxy.getId(), len(ghosts) + 1000))
             ghosts.append(GhostOxygen([posX, temp2, temp3], oxy.getId(), len(ghosts) + 1000))
         elif isXEdge(posX):
-            temp1 = posX + xHi if posX == lowestX else posX - xHi
+            temp1 = posX + xHi if round(posX, 5) == lowestX else posX - xHi
             ghosts.append(GhostOxygen([temp1, posY, posZ], oxy.getId(), len(ghosts) + 1000))
         elif isYEdge(posY):
-            temp2 = posY + yHi if posY == lowestY else posY - yHi
+            temp2 = posY + yHi if round(posY, 5) == lowestY else posY - yHi
             ghosts.append(GhostOxygen([posX, temp2, posZ], oxy.getId(), len(ghosts) + 1000))
         elif isZEdge(posZ):
-            temp3 = posZ + zHi if posZ == lowestZ else posZ - zHi
+            temp3 = posZ + zHi if round(posZ, 5) == lowestZ else posZ - zHi
             ghosts.append(GhostOxygen([posX, posY, temp3], oxy.getId(), len(ghosts) + 1000))
             
 
@@ -213,11 +213,20 @@ for i in range(len(axes)):
     else:
         #If the axis has no Ghost atom:
         if not isGhostAxis(axes[i]):
+            #Generate the random number for the site
             site = random.randint(1,2)
+
+            #Pull the position of that site
             position = axes[i].getSitePosition(site)
+
+            #Generate the hydrogen
             hyd = Hydrogen(position)
+
+            #Add the hydrogen to the axis and as a bond
             axes[i].addHydrogen(hyd, site)
             axes[i].getOxygens()[site-1].addChemBond(hyd)
+
+            #Add Hydrogen to the list of hydrogens
             hydrogens.append(hyd)
 
         #If the axis is a ghost axis
@@ -229,14 +238,14 @@ for i in range(len(axes)):
 
             #Generate a random site number
             site = random.randint(1,2)
-
+            
             #Find the position based on the site
             position = [0,0,0]
             if site == 1:
                 position = axes[i].getSiteRealPosition()
             else:
-                positon = axes[index].getSiteRealPosition()
-            
+                position = axes[index].getSiteRealPosition()
+
             #Generate the new hydrogen
             hyd = Hydrogen(position)
 
@@ -262,8 +271,6 @@ print("Number of axes = " + str(len(axes)))
 print("Number of Oxygens = " + str(len(oxygens)))
 print("Number of Hydrogens = " + str(len(hydrogens)))
 
-for ghost in ghosts:
-    print("Ghost " + str(ghost.getId()) + " has " + str(ghost.getNumBonds()) + " chemical bonds") 
 
 """
 Monte Carlo Simulation 
@@ -332,9 +339,9 @@ for oxy in oxygens:
 
 #Add Velocities Section
 file.write("\nVelocities\n\n")
-for i in range(216 + len(ghosts)+len(hydrogens)):
+for i in range(len(oxygens) + len(hydrogens)):
     file.write("\t" + str(i + 1) + "\t0\t0\t0\n")
-'''
+
 #Add Bonds Section
 file.write("\nBonds\n\n")
 bondId = 1
@@ -348,8 +355,5 @@ for oxy in oxygens:
     oxyId += 1
 
 #Add Angles Section - add after Monte Carlo Simulation
-file.write("\nAngles\n")
-for oxy in oxygens:
-'''
 
 file.close()
