@@ -45,6 +45,7 @@ class Site():
     def delHydrogen(self):
         hyd = self.__hydrogen
         self.__hydrogen = None
+        self.__occupied = False
         return hyd
 
 

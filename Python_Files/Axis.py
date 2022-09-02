@@ -7,13 +7,15 @@ from GhostOxygen import GhostOxygen
 """Class Header"""
 class Axis():
     """Constructor"""
-    def __init__(self, oxyA, oxyB):
+    def __init__(self, oxyA, oxyB, ghost):
         self.__oxy1 = oxyA
         self.__length = self.__calcLength(oxyA.getPosition(), oxyB.getPosition())
         self.__oxy2= oxyB
         self.__site1 = self.__calcSitePos(oxyA, oxyB)
         self.__site2 = self.__calcSitePos(oxyB, oxyA)
         self.__hasHydrogen = False
+        self.__isGhostAxis = ghost
+        self.__connectedAxis = None
 
     """Methods"""
     #hasHydrogen method
@@ -22,11 +24,39 @@ class Axis():
     def hasHydrogen(self):
         return self.__hasHydrogen
 
+    def isGhostAxis(self):
+        return self.__isGhostAxis
+
     #addGhostHyd method:
     #   input: none
     #   output: none
     def addGhostHyd(self):
         self.__hasHydrogen = True
+
+    #getOccupiedSite method
+    #   Input: none
+    #   output: the number of site where the hydrogen is or -1 if there is not one.
+    def getOccupiedSite(self):
+        if self.__site1.isOccupied():
+            return 1
+        elif self.__site2.isOccupied():
+            return 2
+        else:
+            return -1
+
+    #addConnectedAxis method
+    #   Input: the axis that is connected to this one 
+    #   output: none
+    #   Why: This is to prevent increased probabilty of choosing and modifying a hydrogen
+    #       on a ghost axis
+    def addConnectedAxis(self, axis):
+        self.__connectedAxis = axis
+
+    #getConnectedAxis method
+    #   Input: none
+    #   Output: the axis that is connected to this axis
+    def getConnectedAxis(self):
+        return self.__connectedAxis
 
     #getOxygens
     #   Input: none
@@ -62,6 +92,40 @@ class Axis():
                 return None
         else:
             return None
+    
+    def pullHyd(self):
+        if self.__isGhostAxis:
+            if self.__site1.isOccupied():
+                return self.__site1.getHydrogen()
+            else:
+                return self.__connectedAxis.__site1.getHydrogen()
+        else:
+            if self.__site1.isOccupied():
+                return self.__site1.getHydrogen()
+            else:
+                return self.__site2.getHydrogen()
+
+    #delHydrogens method
+    #   Input; none
+    #   Output; none, but there will be no hydrogen on the axis
+    def delHydrogens(self):
+        if self.__site1.isOccupied():
+            self.__site1.delHydrogen()
+        elif self.__site2.isOccupied():
+            self.__site2.delHydrogen()
+        self.__hasHydrogen = False
+
+    #delHydrogen method
+    def delHydrogen(self, site):
+        hyd = None
+        if site == 1 and self.__site1.isOccupied():
+            hyd = self.__site1.delHydrogen()
+            self.__hasHydrogen = False
+            return hyd
+        elif site == 2 and self.__site2.isOccupied():
+            hyd = self.__site2.delHydrogen()
+            self.__hasHydrogen = False
+            return hyd
 
     #getSitePosition method
     #   Input: the site to get the position of

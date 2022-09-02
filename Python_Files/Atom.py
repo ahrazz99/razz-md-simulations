@@ -28,25 +28,33 @@ class Atom(object):
     #   output: the bond at the index if present, none if not
     def getChemBond(self, index):
         if len(self.__chemBonds) < (index + 1):
-            return none
+            return None
         else:
             return self.__chemBonds[index]
+    def getBonds(self):
+        return self.__chemBonds
     
     #getNumBonds method
     #   input: none
     #   output: the number of chemical bonds the atom currently has
     def getNumBonds(self):
         return len(self.__chemBonds)
+   
+    def changePosition(self, position):
+        self.__position = position
 
     #delChemBond method
-    #   input: the index of the Atom to remove
-    #   output: the removed Atom
-    def delChemBond(self, index):
-        if len(self.__chemBonds) < (index + 1):
-            return none
-        else:
-            return self.__chemBonds.pop(index)
-    
+    #   input: the atom to remove
+    #   output: none
+    def delAtom(self, atom):
+        if atom is None:
+            return
+        for i in range(len(self.__chemBonds)):
+            if self.__chemBonds[i] == atom:
+                self.__chemBonds.pop(i)
+                return
+        return
+
     #OVerriding Equals function
     #   Input: self and object to compare to
     #   Output: true if the 2 atoms' positions are the same
@@ -55,3 +63,4 @@ class Atom(object):
         posYCheck = self.__position[1] == other.__position[1]
         posZCheck = self.__position[2] == other.__position[2]
         return posXCheck and posYCheck and posZCheck
+        
