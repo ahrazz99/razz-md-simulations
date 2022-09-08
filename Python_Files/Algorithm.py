@@ -517,7 +517,7 @@ file.write(str(len(oxygens) + len((hydrogens))) + " atoms\n")
 file.write("2 atom types\n")
 file.write(str(numBonds) + " bonds\n")
 file.write("1 bond types\n")
-file.write(str(numAngles) + " angles\n")
+file.write(str(round(numAngles)) + " angles\n")
 file.write("1 angle types\n\n")
 
 #Add the box dimensions
