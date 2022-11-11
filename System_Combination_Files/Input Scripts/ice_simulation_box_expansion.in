@@ -1,0 +1,51 @@
+#=======================
+# Initialization 
+#=======================
+units 		real
+dimension	3
+atom_style 	full
+bond_style 	harmonic
+angle_style 	harmonic
+pair_style 	lj/cut/tip4p/long 1 2 1 1 0.1546 12.0 10.0
+kspace_style 	pppm/tip4p 1.0e-5
+boundary 	p p p
+
+#Add first Set of water and expand it
+read_data ice_504_minimized_3.lammps
+change_box all x delta -5 5 set remap
+
+#Necessary parameters
+pair_coeff 1 1 0.1852	 3.1589
+pair_coeff 2 2 0.0	 0.0
+pair_coeff 1 2 0.0	 0.0
+
+#Bond Coefficients
+bond_coeff 1 0.0 0.9572
+
+#Angle Coefficients
+angle_coeff 1 0.0 104.52
+
+#Neighbor Handling
+neighbor 2.0 bin
+neigh_modify delay 1
+
+#Shake Algorithm
+fix SHAKE all shake 0.0001 200 0 b 1 a 1
+
+#Equilibration
+fix NVT all nvt temp 250 250 100
+compute Tpar all temp/partial 1 1 1
+fix_modify NVT temp Tpar
+
+#Thermodynamic Data Output
+thermo_style custom step temp etotal press
+thermo 500
+
+#Timestep = 0.01 fs
+timestep 0.01
+
+#Runtime = 10000 timesteps
+run 10000
+
+#Data Output
+write_data ice_box_expanded.lammps

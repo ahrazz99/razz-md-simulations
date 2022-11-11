@@ -1,0 +1,49 @@
+# Initialization 
+#=======================
+units 		real
+dimension	3
+atom_style 	full
+bond_style 	harmonic
+angle_style 	harmonic
+pair_style 	lj/cut/tip4p/long 1 2 1 1 0.1546 12.0 10.0
+kspace_style 	pppm/tip4p 1.0e-5
+boundary 	p p p
+
+#Read in the data file
+read_data NaCl_minimized.lammps
+
+#Necessary parameters
+pair_coeff 1 1 0.1852	 3.1589
+pair_coeff 2 2 0.0	 0.0
+pair_coeff 1 2 0.0	 0.0
+bond_coeff 1 0.0 0.9572
+angle_coeff 1 0.0 104.52
+
+#Neighbor handling
+neighbor 2.0 bin
+neigh_modify delay 1
+
+#Shake Algorithm for keeping water rigid
+fix SHAKE all shake 0.0001 200 0 b 1 a 1
+
+#NVT equilibration
+fix NVT all nvt temp 273 273 100
+
+#Modify NVT fix with computation 
+compute Tpar all temp/partial 1 1 1
+fix_modify NVT temp Tpar
+
+
+#Thermo style
+thermo_style custom step temp etotal press
+thermo 500
+
+#Dump for visualization
+dump all all custom 500 vis_stacked_equilibration.lammpstrj id type x y z
+
+timestep 1
+run 25000
+
+write_data water_equilibrated.lammps
+
+

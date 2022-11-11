@@ -1,0 +1,57 @@
+#======================
+# Initialization
+#======================
+units		real
+dimension	3
+atom_style	full
+bond_style	harmonic
+angle_style	harmonic
+pair_style	lj/cut/tip4p/long 1 2 1 1 0.1546 12.0 10.0
+kspace_style	pppm/tip4p 1.0e-5
+boundary 	p p p
+
+#Read in the data
+read_data NaCl_added.lammps
+
+#Pair Coefficients for lj/cut/tip4p/long pair style
+pair_coeff 1 1 0.1852 3.1589
+pair_coeff 2 2 0.0	 0.0
+pair_coeff 1 2 0.0	 0.0
+pair_coeff 3 3 0.3519 2.21737
+pair_coeff 4 4 0.018962 4.69906
+pair_coeff 1 3 0.18962 2.60383
+pair_coeff 1 4 0.01481 4.23867
+pair_coeff 2 3 0.0 0.0
+pair_coeff 2 4 0.0 0.0
+pair_coeff 3 4 0.3439 3.00512
+
+#Bond Coefficient for Harmonic Bond
+bond_coeff 1 0.0 0.9572
+
+#Angle Coefficient for Harmonic Angle style
+angle_coeff 1 0.0 104.52
+
+#Neighbor Handling 
+neighbor 2.0 bin
+neigh_modify delay 1
+
+#Groups
+group water type 1 2 
+group ions type 3 4
+
+#Thermodynamic Handling
+thermo_style custom step temp etotal press
+thermo 500 
+
+#Dump output for visualization across time.
+dump all all custom 100 NaCl_minimization_vis.lammpstrj id type x y z
+
+#Spring fix to force minimization to be focused on solely ions
+fix tether water spring/self 1000
+
+#Minimization Parameters
+min_style cg
+minimize 1e-10 1e-10 5000 10000
+
+#Write Output Data
+write_data NaCl_min.lammps

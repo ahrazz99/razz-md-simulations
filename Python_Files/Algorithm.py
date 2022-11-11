@@ -521,7 +521,10 @@ file.write(str(round(numAngles)) + " angles\n")
 file.write("1 angle types\n\n")
 
 #Add the box dimensions
-file.write(xlo + " " + xhi + " xlo xhi\n")
+
+xLo = xLo - 5
+xHi = xHi + 5
+file.write(str(xLo) + " " + str(xHi) + " xlo xhi\n")
 file.write(ylo + " " + yhi + " ylo yhi\n")
 file.write(zlo + " " + zhi + " zlo zhi\n\n")
 

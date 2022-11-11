@@ -1,0 +1,34 @@
+# Initialization 
+#=======================
+units 		real
+dimension	3
+atom_style 	full
+bond_style 	harmonic
+angle_style 	harmonic
+pair_style 	lj/cut/tip4p/long 1 2 1 1 0.1546 12.0 10.0
+kspace_style 	pppm/tip4p 1.0e-5
+boundary 	p p p
+
+variable Sx equal 13.472193585307469+5
+variable Sx2 equal ${Sx}*2
+
+#Add 3 sets of water blocks
+read_data water_block_equi_4.lammps
+read_data water_block_equi_4.lammps add append shift ${Sx} 0.0 0.0
+read_data water_block_equi_4.lammps add append shift ${Sx2} 0.0 0.0
+
+#Necessary parameters
+pair_coeff 1 1 0.1852	 3.1589
+pair_coeff 2 2 0.0	 0.0
+pair_coeff 1 2 0.0	 0.0
+
+#Bond Coefficients
+bond_coeff 1 0.0 0.9572
+
+#Angle Coefficients
+angle_coeff 1 0.0 104.52
+
+#Data Output
+write_data water_block_stacked_1.lammps
+
+

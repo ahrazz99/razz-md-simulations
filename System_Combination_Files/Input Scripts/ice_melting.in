@@ -1,0 +1,54 @@
+#============================
+#Initialization
+#============================
+
+#Necessary Parameters:
+units		real
+dimension	3
+atom_style	full
+bond_style	harmonic
+angle_style	harmonic
+pair_style	lj/cut/tip4p/long 1 2 1 1 0.1546 12.0 10.0
+kspace_style	pppm/tip4p 1.0e-5
+boundary 	p p p
+
+#Read in the ice data
+read_data ice_504_minimized_3.lammps
+
+#Required Coefficients
+pair_coeff 1 1 0.1852 3.1589
+pair_coeff 2 2 0.0 0.0
+pair_coeff 1 2 0.0 0.0
+
+#Bond Coefficient
+bond_coeff 1 0.0 0.9572
+
+#Angle Coefficient
+angle_coeff 1 0.0 104.52
+
+#Neighbor Handling
+neighbor 2.0 bin
+neigh_modify delay 1
+
+#Constrain the H2O bonds
+fix SHAKE all shake 0.0001 200 0 b 1 a 1
+
+#Melting Fixes at T = 400 K
+fix NVT all nvt temp 400.0 400.0 100
+compute Tpar all temp/partial 1 1 1 
+fix_modify NVT temp Tpar
+
+#Thermodynamic data handling 
+# 	print timestep, Temp, total Energy and pressure
+#		Every 5000 timesteps
+thermo_style custom step temp etotal press 
+thermo 5000
+
+#Timestep = 2 fs
+timestep 2
+
+#Rumtime = 250000 timesteps
+run 250000
+
+#Write data output
+write_data water_initial.lammps
